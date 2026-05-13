@@ -63,15 +63,19 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       <div className="form-grid">
         <div className="field full">
           <label htmlFor="image">Tovar rasmi</label>
-          <div className="row">
+          <div className="upload-panel">
             {imageUrl ? (
               <img alt="" className="product-image" src={imageUrl} />
             ) : (
               <span className="image-placeholder">Rasm</span>
             )}
+            <div className="upload-copy">
+              <strong>Mahsulot rasmi</strong>
+              <span className="muted">JPG, PNG, WEBP yoki GIF. Limit: 5 MB.</span>
+            </div>
             <label className="ghost-button" htmlFor="image">
               <ImagePlus />
-              {uploading ? "Yuklanmoqda..." : "Rasm yuklash"}
+              {uploading ? "Yuklanmoqda..." : "Rasm tanlash"}
             </label>
             <input
               accept="image/jpeg,image/png,image/webp,image/gif"

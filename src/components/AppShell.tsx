@@ -29,17 +29,29 @@ const navItems = [
   { href: "/settings", label: "Sozlama", icon: Settings }
 ];
 
+const compactNavItems = [
+  navItems[0],
+  navItems[1],
+  { href: "/products/new", label: "Qo'shish", icon: Plus },
+  navItems[4],
+  navItems[2]
+];
+
 function isActive(pathname: string, href: string) {
   if (href === "/") {
     return pathname === "/";
   }
 
-  return pathname.startsWith(href);
+  if (href === "/products" && pathname === "/products/new") {
+    return false;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function NavLinks({ compact = false }: { compact?: boolean }) {
   const pathname = usePathname();
-  const items = compact ? navItems.slice(0, 5) : navItems;
+  const items = compact ? compactNavItems : navItems;
 
   return (
     <>
@@ -48,7 +60,9 @@ function NavLinks({ compact = false }: { compact?: boolean }) {
         return (
           <Link
             aria-label={item.label}
-            className={`nav-link ${isActive(pathname, item.href) ? "active" : ""}`}
+            className={`nav-link ${item.href === "/products/new" ? "primary" : ""} ${
+              isActive(pathname, item.href) ? "active" : ""
+            }`}
             href={item.href}
             key={item.href}
             title={item.label}
@@ -91,9 +105,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
             <span>Shaxsiy Ombor</span>
           </Link>
-          <div className="row" style={{ flexWrap: "nowrap" }}>
-            <Link className="icon-button" href="/products/new" title="Tovar qo'shish">
+          <div className="topbar-actions">
+            <Link className="mobile-add-button" href="/products/new" title="Tovar qo'shish">
               <Plus />
+              <span>Tovar</span>
             </Link>
             <Link className="icon-button" href="/settings" title="Sozlamalar">
               <Settings />

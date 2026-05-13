@@ -31,6 +31,31 @@ export default async function DashboardPage() {
         </div>
       </header>
 
+      <section className="quick-actions">
+        <Link className="quick-card product" href="/products/new">
+          <div className="row">
+            <div className="brand-mark">
+              <Plus size={24} />
+            </div>
+            <div>
+              <strong>Yangi tovar</strong>
+              <p>Rasm, SKU, narx va boshlang'ich qoldiq bilan qo'shish</p>
+            </div>
+          </div>
+        </Link>
+        <Link className="quick-card sale" href="/sales">
+          <div className="row">
+            <div className="brand-mark">
+              <ShoppingCart size={24} />
+            </div>
+            <div>
+              <strong>Tez sotuv</strong>
+              <p>SKU orqali topish, qoldiq va foydani avtomatik hisoblash</p>
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {!data.setup.configured ? (
         <div className="notice">{data.setup.message}</div>
       ) : null}
@@ -94,7 +119,7 @@ export default async function DashboardPage() {
                     <strong>{String(movement.product_name)}</strong>
                     <br />
                     <span className="muted">
-                      {String(movement.type)} · {formatDate(String(movement.created_at))}
+                      {String(movement.type)} - {formatDate(String(movement.created_at))}
                     </span>
                   </span>
                   <span className="badge">{formatNumber(Number(movement.quantity))}</span>
@@ -153,3 +178,4 @@ function MiniList({
     </div>
   );
 }
+

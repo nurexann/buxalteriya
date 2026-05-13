@@ -14,7 +14,10 @@ export default async function NewProductPage() {
       <header className="page-header">
         <div>
           <h1 className="page-title">Tovar qo'shish</h1>
-          <p className="page-subtitle">SKU unique bo'lishi shart.</p>
+          <p className="page-subtitle">
+            Rasm yuklang, nom va SKU kiriting, narx hamda boshlang'ich qoldiqni to'ldiring.
+            SKU unique bo'lishi shart.
+          </p>
         </div>
         <Link className="ghost-button" href="/products">
           Orqaga
