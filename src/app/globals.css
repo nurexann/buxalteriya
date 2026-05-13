@@ -1,20 +1,20 @@
 ﻿:root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #eef3f4;
-  --text: #17202f;
-  --muted: #697386;
-  --line: #dce2e8;
-  --accent: #0f766e;
-  --accent-strong: #0b5f59;
-  --blue: #2563eb;
-  --danger: #c2410c;
-  --danger-bg: #fff1ea;
-  --success: #15803d;
-  --success-bg: #edf8f0;
-  --warning: #a16207;
-  --warning-bg: #fff8dd;
-  --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --bg: #05070a;
+  --surface: #0f141b;
+  --surface-2: #17202b;
+  --text: #f3f7fb;
+  --muted: #9caaba;
+  --line: #273341;
+  --accent: #19b394;
+  --accent-strong: #23cda9;
+  --blue: #60a5fa;
+  --danger: #fb923c;
+  --danger-bg: #2b160d;
+  --success: #5eea93;
+  --success-bg: #0e2a1b;
+  --warning: #facc15;
+  --warning-bg: #2a230d;
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
 }
 
 * {
@@ -22,7 +22,10 @@
 }
 
 html {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top left, rgba(25, 179, 148, 0.12), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.1), transparent 28rem),
+    var(--bg);
   color: var(--text);
   font-family:
     Inter,
@@ -80,7 +83,7 @@ img {
   min-height: 60px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
-  background: rgba(246, 247, 249, 0.95);
+  background: rgba(5, 7, 10, 0.9);
   backdrop-filter: blur(12px);
 }
 
@@ -121,7 +124,7 @@ img {
   padding: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(15, 20, 27, 0.96);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
 }
@@ -190,7 +193,7 @@ img {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .panel,
@@ -280,7 +283,7 @@ img {
   min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: white;
+  background: #0b1016;
   color: var(--text);
   padding: 10px 12px;
   outline: none;
@@ -289,6 +292,11 @@ img {
 .textarea {
   min-height: 88px;
   resize: vertical;
+}
+
+.select option {
+  background: #0b1016;
+  color: var(--text);
 }
 
 .input:focus,
@@ -325,7 +333,7 @@ img {
 
 .ghost-button {
   border-color: var(--line);
-  background: white;
+  background: #0b1016;
   color: var(--text);
 }
 
@@ -343,7 +351,7 @@ img {
   width: 42px;
   padding: 0;
   border-color: var(--line);
-  background: white;
+  background: #0b1016;
   color: var(--text);
 }
 
@@ -482,8 +490,8 @@ img {
 
 .notice {
   border-color: #f0d78a;
-  background: #fff9e6;
-  color: #6f4e00;
+  background: #241f10;
+  color: #f5d878;
 }
 
 .details-summary {
@@ -511,7 +519,7 @@ img {
   gap: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: white;
+  background: #0b1016;
   padding: 9px;
   color: var(--text);
   text-align: left;
@@ -519,7 +527,7 @@ img {
 
 .search-result.selected {
   border-color: var(--accent);
-  background: #edf8f7;
+  background: #102a25;
 }
 
 .login-page {
@@ -548,7 +556,7 @@ img {
     height: 100vh;
     padding: 18px;
     border-right: 1px solid var(--line);
-    background: white;
+    background: #090d12;
   }
 
   .sidebar-nav {

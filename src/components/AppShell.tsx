@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Home,
   Package,
+  Plus,
   ReceiptText,
   Settings,
   ShoppingCart,
@@ -90,9 +91,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
             <span>Shaxsiy Ombor</span>
           </Link>
-          <Link className="icon-button" href="/settings" title="Sozlamalar">
-            <Settings />
-          </Link>
+          <div className="row" style={{ flexWrap: "nowrap" }}>
+            <Link className="icon-button" href="/products/new" title="Tovar qo'shish">
+              <Plus />
+            </Link>
+            <Link className="icon-button" href="/settings" title="Sozlamalar">
+              <Settings />
+            </Link>
+          </div>
         </header>
 
         <main className="main-content">{children}</main>

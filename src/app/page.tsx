@@ -1,3 +1,4 @@
+import { Plus, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/data";
@@ -18,9 +19,16 @@ export default async function DashboardPage() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">Bugungi savdo, ombor va pul holati.</p>
         </div>
-        <Link className="button" href="/sales">
-          Tez sotuv
-        </Link>
+        <div className="row">
+          <Link className="button" href="/products/new">
+            <Plus size={18} />
+            Tovar qo'shish
+          </Link>
+          <Link className="ghost-button" href="/sales">
+            <ShoppingCart size={18} />
+            Tez sotuv
+          </Link>
+        </div>
       </header>
 
       {!data.setup.configured ? (
