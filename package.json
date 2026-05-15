@@ -16,11 +16,13 @@
     "telegram:menu": "node scripts/configure-telegram-webapp.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "lucide-react": "^1.14.0",
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "recharts": "^3.8.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

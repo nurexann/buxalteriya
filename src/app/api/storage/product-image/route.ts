@@ -44,6 +44,13 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseAdmin();
+    
+    // YUQORI DARAJADA: Agar bucket yo'q bo'lsa, uni avtomatik yaratishga urinib ko'ramiz
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.find((b: { name: string }) => b.name === "product-images")) {
+      await supabase.storage.createBucket("product-images", { public: true });
+    }
+
     const path = `${user.id}/${Date.now()}-${randomUUID()}.${extensionFromType(file.type)}`;
     const bytes = Buffer.from(await file.arrayBuffer());
     const { error } = await supabase.storage

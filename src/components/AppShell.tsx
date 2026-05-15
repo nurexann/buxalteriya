@@ -11,7 +11,8 @@ import {
   ReceiptText,
   Settings,
   ShoppingCart,
-  WalletCards
+  WalletCards,
+  Scale
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/sales", label: "Sotuv", icon: ShoppingCart },
   { href: "/expenses", label: "Chiqim", icon: WalletCards },
   { href: "/reports", label: "Hisobot", icon: BarChart3 },
+  { href: "/balance", label: "Balans", icon: Scale },
   { href: "/trash", label: "Korzinka", icon: Archive },
   { href: "/settings", label: "Sozlama", icon: Settings }
 ];

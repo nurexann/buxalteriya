@@ -245,12 +245,13 @@ export async function permanentDeleteProductAction(
 export async function createCategoryAction(
   _prevState: ActionState,
   formData: FormData
-): Promise<ActionState> {
+): Promise<ActionState & { categoryId?: string }> {
   try {
     const user = await requireUser();
     const name = formText(formData, "name");
     const supabase = getSupabaseAdmin();
-    const { error } = await supabase.rpc("app_create_category", {
+    // RPC orqali yaratish
+    const { data, error } = await supabase.rpc("app_create_category", {
       p_name: name,
       p_user_id: user.id
     });
@@ -264,7 +265,8 @@ export async function createCategoryAction(
 
     return {
       ok: true,
-      message: "Kategoriya qo'shildi."
+      message: "Kategoriya qo'shildi.",
+      categoryId: data // Assuming RPC returns the ID or we can just let the frontend know it succeeded
     };
   } catch (error) {
     return {

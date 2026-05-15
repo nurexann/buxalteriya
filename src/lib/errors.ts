@@ -14,8 +14,14 @@ const dbErrorMap: Record<string, string> = {
 };
 
 export function toUserError(error: unknown) {
-  const message =
-    error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  let message = "";
+  if (error instanceof Error) {
+    message = error.message;
+  } else if (typeof error === "string") {
+    message = error;
+  } else if (error && typeof error === "object" && "message" in error) {
+    message = String((error as any).message);
+  }
 
   for (const [code, label] of Object.entries(dbErrorMap)) {
     if (message.includes(code)) {

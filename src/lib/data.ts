@@ -437,3 +437,58 @@ export async function getReportData({
     }
   };
 }
+
+export async function getReconciliationBalance() {
+  const supabase = supabaseOrNull();
+  if (!supabase) return [];
+
+  const [productsRes, movementsRes] = await Promise.all([
+    supabase.from("products").select("*").is("deleted_at", null),
+    supabase.from("stock_movements").select("product_id, type, old_quantity, new_quantity")
+  ]);
+
+  const products = (productsRes.data || []) as ProductRow[];
+  const movements = movementsRes.data || [];
+
+  const balanceByProduct = new Map<string, any>();
+  
+  products.forEach(p => {
+    balanceByProduct.set(p.id, {
+      id: p.id,
+      name: p.name,
+      sku: p.sku,
+      current_quantity: Number(p.quantity),
+      purchase_price: Number(p.purchase_price),
+      initial: 0,
+      purchased: 0,
+      sold: 0,
+      other: 0,
+      expected_quantity: 0
+    });
+  });
+
+  movements.forEach(m => {
+    const b = balanceByProduct.get(m.product_id);
+    if (!b) return;
+    
+    const delta = Number(m.new_quantity) - Number(m.old_quantity);
+    
+    if (m.type === 'initial') {
+      b.initial += delta;
+    } else if (m.type === 'purchase') {
+      b.purchased += delta;
+    } else if (m.type === 'sale') {
+      b.sold += Math.abs(delta);
+    } else {
+      b.other += delta;
+    }
+  });
+
+  const result = Array.from(balanceByProduct.values()).map(b => {
+    b.expected_quantity = b.initial + b.purchased - b.sold + b.other;
+    b.difference = b.current_quantity - b.expected_quantity;
+    return b;
+  });
+
+  return result.sort((a, b) => a.name.localeCompare(b.name));
+}

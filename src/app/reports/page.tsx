@@ -5,6 +5,7 @@ import { getCategories, getProducts, getReportData } from "@/lib/data";
 import { formatCurrency, formatDate, formatNumber, todayIsoDate } from "@/lib/format";
 import { EmptyState } from "@/components/EmptyState";
 import { StatCard } from "@/components/StatCard";
+import { ReportCharts } from "@/components/ReportCharts";
 
 export const dynamic = "force-dynamic";
 
@@ -181,6 +182,8 @@ export default async function ReportsPage({
           )}
         </div>
       </section>
+
+      <ReportCharts data={report.money as any} />
 
       <section className="table-wrap">
         <h2 className="section-title">Pul kirim-chiqim tarixi</h2>
