@@ -1,39 +1,46 @@
 # Shaxsiy Ombor va Buxgalteriya
 
-Bitta Next.js codebase: Telegram Mini App ichida ham, oddiy browser dashboard sifatida ham ishlaydi. Maqsad katta ERP emas, shaxsiy ombor, sotuv, kirim, chiqim, pul balansi va auditni ishonchli yuritish.
+Next.js asosidagi bitta web app: Telegram Mini App ichida ham, oddiy browser dashboard sifatida ham ishlaydi. Tizim shaxsiy ombor, kirim, sotuv, xarajat, pul balansi, trash va audit log uchun yozilgan.
 
-## Arxitektura
+## Stack
 
-- Frontend: Next.js App Router, mobile-first Uzbek UI.
-- Backend: Next.js server actions va API routes.
-- Database: Supabase PostgreSQL.
-- Transaction logic: muhim operatsiyalar Postgres RPC funksiyalarida bajariladi.
-- Storage: Supabase Storage `product-images` bucket.
-- Auth: Telegram initData verification + browser uchun owner password.
-- Deploy: Vercel + Vercel Cron.
+- Frontend va backend: Next.js App Router
+- Database: Supabase PostgreSQL
+- Storage: Supabase Storage, `product-images` bucket
+- Auth: Telegram Mini App initData va browser uchun owner parol
+- Deploy: Vercel
+- Cron: Vercel Cron, har kuni trash cleanup
 
-Muhim qoida: sotuv, kirim, xarajat, stock movement, money movement va audit log fizik delete qilinmaydi. Xato yozuvlar `cancelled`, `reversed` yoki `archived` orqali tuzatiladi.
+## Muhim Qoidalar
+
+- Sotuv, kirim, xarajat, stock movement, money movement va audit log fizik delete qilinmaydi.
+- Product/category avval trashga tushadi.
+- Trashdagi oddiy entitylar 3 kundan keyin cron orqali purge qilinadi.
+- Tovar va pul harakati muhim joylarda Postgres RPC transaction bilan bajariladi.
+- Product image permanent delete bo'lmaguncha storage'dan o'chmaydi.
 
 ## Project Structure
 
 ```txt
 src/app
-  api/
-    auth/telegram
-    cron/purge-trash
-    products/search
-    reports/csv
-    storage/product-image
-  actions/
+  api/auth/telegram
+  api/cron/purge-trash
+  api/products/search
+  api/reports/csv
+  api/storage/product-image
+  actions
   products, stock, purchases, sales, expenses, reports, trash, settings pages
 src/components
 src/lib
   auth, business, supabase, data helpers
+scripts
+  check-deploy-env.mjs
+  configure-telegram-webapp.mjs
 supabase/migrations
 tests
 ```
 
-## Local Setup
+## Local Run
 
 ```bash
 npm install
@@ -41,51 +48,78 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Windows PowerShell’da `npm.ps1` bloklangan bo‘lsa:
+Windows PowerShell uchun:
 
 ```powershell
 npm.cmd install
 npm.cmd run dev
 ```
 
-Local browser login default parol: `owner`. Production’da albatta `OWNER_PASSWORD` qo‘ying.
+Local browser login default parol: `owner`. Production uchun albatta kuchli `OWNER_PASSWORD` qo'ying.
 
-## Environment
+## Env Variables
+
+Vercel project settings va local `.env.local` uchun kerakli envlar:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
+
+# Legacy Supabase key nomlari ham ishlaydi:
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_BOT_USERNAME=
 TELEGRAM_ADMIN_ID=
-TELEGRAM_WEBAPP_URL=
+TELEGRAM_WEBAPP_URL=https://YOUR_VERCEL_DOMAIN.vercel.app
+
 CRON_SECRET=
 OWNER_PASSWORD=
 ```
 
-Supabase'ning yangi API Keys sahifasida `Publishable key` qiymatini
-`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ga, `Secret keys` dagi default secret
-qiymatini `SUPABASE_SECRET_KEY` ga qo'ying. Legacy tab ishlatsangiz,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` va `SUPABASE_SERVICE_ROLE_KEY` ham ishlaydi.
+Supabase yangi API Keys sahifasida:
 
-`TELEGRAM_ADMIN_ID` faqat owner Telegram user ID bo‘lishi kerak. Mini App boshqa Telegram userlarga kirishni rad qiladi.
+- Publishable key -> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- Secret key -> `SUPABASE_SECRET_KEY`
 
-Token chatga yoki logga tushib qolgan bo‘lsa, deploydan oldin BotFather orqali tokenni regenerate qiling.
+Legacy API Keys ishlatsangiz:
 
-## Supabase Migration
+- anon key -> `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- service_role key -> `SUPABASE_SERVICE_ROLE_KEY`
 
-1. Supabase project yarating.
-2. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` ni `.env.local` ga qo'ying. Legacy tab ishlatsangiz `NEXT_PUBLIC_SUPABASE_ANON_KEY` va `SUPABASE_SERVICE_ROLE_KEY` ham qabul qilinadi.
-3. Migration ishga tushiring:
+Secret/service role keyni hech qachon `NEXT_PUBLIC_` bilan boshlamang.
+
+Envlarni tekshirish:
 
 ```bash
-supabase db push
+npm run deploy:check
 ```
 
-Yoki Supabase SQL Editor’da `supabase/migrations/001_initial_schema.sql` faylini ishga tushiring.
+## Supabase Setup
+
+1. Supabase project yarating.
+2. Project URL va API keys qiymatlarini `.env.local` yoki Vercel env settingsga qo'ying.
+3. Supabase CLI bilan login qiling:
+
+```bash
+npx supabase login
+```
+
+4. Projectni ulang:
+
+```bash
+npx supabase link --project-ref YOUR_PROJECT_REF
+```
+
+5. Migrationlarni cloud databasega yuboring:
+
+```bash
+npm run deploy:supabase
+```
+
+Yoki SQL Editor orqali `supabase/migrations/001_initial_schema.sql` faylini ishga tushiring.
 
 Migration quyidagilarni yaratadi:
 
@@ -93,34 +127,84 @@ Migration quyidagilarni yaratadi:
 - `sales`, `purchases`, `expenses`
 - `stock_movements`, `money_movements`
 - `audit_logs`, `app_settings`
-- dashboard uchun view’lar
+- dashboard uchun viewlar
 - transaction RPC funksiyalar
-- important records delete prevention trigger’lari
+- important records delete prevention triggerlari
+- `product-images` storage bucket
 
-## Storage
+## Supabase Storage
 
-Migration `product-images` bucket yaratishga urinadi. Supabase paneldan tekshiring:
+Bucket:
 
-- Bucket name: `product-images`
+```txt
+product-images
+```
+
+Talablar:
+
 - Public: enabled
 - File size limit: 5 MB
 - MIME: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
 
-Product soft delete qilinganda rasm o‘chmaydi. Product permanent delete bo‘lsa va tarixiy yozuvlar bo‘lmasa, storage’dagi rasm ham o‘chiriladi.
+Migration bucketni yaratishga yoki yangilashga urinadi. Deploydan keyin Supabase Storage panelida tekshirib chiqing.
+
+## Vercel Deploy
+
+1. GitHub repo'ni Vercelga import qiling.
+2. Framework preset: Next.js.
+3. Build command default qolishi mumkin: `npm run build`.
+4. Env Variables bo'limiga yuqoridagi envlarni qo'ying.
+5. Deploy qiling.
+6. Production domain chiqqach `TELEGRAM_WEBAPP_URL` ni shu domain bilan yangilang.
+7. Redeploy qiling.
+
+CLI orqali production deploy:
+
+```bash
+npm run deploy:vercel
+```
+
+## Vercel Cron
+
+`vercel.json` ichida trash cleanup cron bor:
+
+```json
+{
+  "path": "/api/cron/purge-trash",
+  "schedule": "0 21 * * *"
+}
+```
+
+Bu UTC 21:00, Asia/Tashkent bo'yicha taxminan 02:00. Vercel cron production deploymentda ishlaydi.
+
+Cron endpoint `CRON_SECRET` bilan himoyalangan. Vercel project env ichida `CRON_SECRET` qo'yilsa, Vercel cron requestga `Authorization: Bearer <CRON_SECRET>` headerini yuboradi.
+
+Manual test:
+
+```bash
+curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
+  "https://YOUR_DOMAIN/api/cron/purge-trash"
+```
 
 ## Telegram Mini App
 
-1. BotFather’da bot yarating yoki mavjud botdan foydalaning.
-2. `TELEGRAM_BOT_TOKEN` va `TELEGRAM_BOT_USERNAME` ni sozlang.
-3. Deploy URL’ni `TELEGRAM_WEBAPP_URL` ga qo‘ying.
-4. BotFather’da Mini App/Web App URL sifatida Vercel URL’ni ulang.
-5. `TELEGRAM_ADMIN_ID` faqat egasi ID bo‘lsin.
+1. BotFather orqali bot yarating yoki mavjud botdan foydalaning.
+2. `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_ADMIN_ID` ni sozlang.
+3. Vercel production URLni `TELEGRAM_WEBAPP_URL` ga qo'ying.
+4. BotFatherda Mini App/Web App URL sifatida Vercel URLni ulang.
+5. Telegram menu buttonni avtomatik sozlash:
 
-Telegram auth `initData` hash’ini bot token bilan tekshiradi va 7 kundan eski auth data’ni rad qiladi.
+```bash
+npm run telegram:menu
+```
+
+`TELEGRAM_ADMIN_ID` faqat owner Telegram user ID bo'lishi kerak. Boshqa Telegram userlar Mini App authdan o'tmaydi.
+
+Token biror chatga yoki logga tushib qolgan bo'lsa, deploydan oldin BotFather orqali tokenni regenerate qiling.
 
 ## Business Logic
 
-Kirim RPC:
+Kirim:
 
 - purchase create
 - product quantity increase
@@ -128,7 +212,7 @@ Kirim RPC:
 - money movement expense create
 - audit log create
 
-Sotuv RPC:
+Sotuv:
 
 - stock yetarliligi tekshiriladi
 - sale create
@@ -140,83 +224,43 @@ Sotuv RPC:
 
 Sotuv bekor qilish:
 
-- sale `cancelled`
+- sale status `cancelled`
 - product quantity increase
 - reverse stock movement
 - reverse money movement
-- audit log
+- audit log create
 
-Foyda formulasi:
-
-```txt
-foyda = (sotuv narxi - xarid narxi) * sotilgan son - chegirma
-```
-
-## Trash va Cron
-
-Soft delete maydonlari:
-
-- `deleted_at`
-- `deleted_by`
-- `delete_reason`
-
-Vercel cron har kuni ishga tushadi:
-
-```json
-{
-  "path": "/api/cron/purge-trash",
-  "schedule": "0 21 * * *"
-}
-```
-
-Asia/Tashkent bo‘yicha bu taxminan har kuni tungi 02:00 atrofida. Endpoint `CRON_SECRET` bilan himoyalangan.
-
-Manual tekshirish:
-
-```bash
-curl "https://YOUR_DOMAIN/api/cron/purge-trash?secret=YOUR_CRON_SECRET"
-```
-
-## Reports
-
-Hisobotlarda filterlar bor:
-
-- sana oralig‘i
-- tovar
-- kategoriya
-- movement type
-
-MVP’da CSV export mavjud:
+Foyda:
 
 ```txt
-/api/reports/csv?type=sales&from=2026-05-01&to=2026-05-13
+profit = (sale_price - purchase_price) * quantity - discount
 ```
-
-Keyin PDF/Excel qo‘shish uchun report data `src/lib/data.ts` ichida markazlashgan.
 
 ## Backup va Restore
 
-Eng yaxshi amaliyot:
+Tavsiya:
 
-- Supabase Pro bo‘lsa PITR yoqing.
-- Kamida daily backup schedule yoqing.
+- Supabase Pro bo'lsa PITR yoqing.
+- Daily backup schedule yoqing.
 - Haftada bir marta manual SQL dump oling.
-- Storage bucket uchun ham alohida backup strategiya belgilang.
+- Storage bucket uchun alohida backup strategiya belgilang.
 
 Restore:
 
 1. Supabase backup restore qiling yoki SQL dump import qiling.
 2. Storage bucket fayllarini tiklang.
-3. Env qiymatlari eski project URL/key’lariga mos kelishini tekshiring.
+3. Vercel env qiymatlari yangi Supabase projectga mosligini tekshiring.
 4. `stock_movements` orqali product quantity audit qiling.
 
-## Testlar
+## Test
 
 ```bash
+npm run typecheck
 npm test
+npm run build
 ```
 
-Testlar qamrovi:
+Test qamrovi:
 
 - product create
 - SKU unique validation
@@ -228,30 +272,20 @@ Testlar qamrovi:
 - purchase creates money expense
 - expense decreases balance
 - profit calculation
-- soft delete
-- restore
+- soft delete and restore
 - auto purge after 3 days
 - important records are not physically deleted
 - audit log creation
 
-## Deploy Vercel
+## Deploy Checklist
 
-1. GitHub repo’ga push qiling.
-2. Vercel’da import qiling.
-3. Env variables’ni Vercel project settings’da qo‘ying.
-4. Supabase migration bajarilganini tekshiring.
-5. `vercel.json` cron konfiguratsiyasi deploy bilan birga ketadi.
-6. Telegram Mini App URL’ni Vercel production URL bilan yangilang.
-
-## MVP Chegaralari
-
-Hozircha ataylab qo‘shilmagan:
-
-- xodimlar va rollar
-- ko‘p ombor
-- mijozlar bazasi
-- qarzdorlik
-- yetkazib beruvchi bazasi
-- barcode/QR
-- payment gateway
-- murakkab ERP funksiyalar
+- [ ] Supabase project yaratildi
+- [ ] `supabase db push` bajarildi
+- [ ] `product-images` bucket tekshirildi
+- [ ] Vercel project GitHub repo bilan ulandi
+- [ ] Vercel env variables to'liq qo'yildi
+- [ ] `npm run deploy:check` xatosiz o'tdi
+- [ ] Vercel production deploy o'tdi
+- [ ] `TELEGRAM_WEBAPP_URL` production URLga yangilandi
+- [ ] `npm run telegram:menu` bajarildi
+- [ ] Browser login va Telegram Mini App test qilindi

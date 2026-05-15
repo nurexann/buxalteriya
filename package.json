@@ -9,7 +9,11 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy:check": "node scripts/check-deploy-env.mjs",
+    "deploy:supabase": "npx supabase db push",
+    "deploy:vercel": "npx vercel --prod",
+    "telegram:menu": "node scripts/configure-telegram-webapp.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",

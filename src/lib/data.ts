@@ -14,7 +14,7 @@ export const setupState: SetupState = {
   configured: isSupabaseConfigured(),
   message: isSupabaseConfigured()
     ? undefined
-    : "Supabase env qiymatlari sozlanmagan. .env.local fayliga NEXT_PUBLIC_SUPABASE_URL va SUPABASE_SERVICE_ROLE_KEY qo'shing."
+    : "Supabase env qiymatlari sozlanmagan. NEXT_PUBLIC_SUPABASE_URL va SUPABASE_SECRET_KEY yoki SUPABASE_SERVICE_ROLE_KEY qo'shing."
 };
 
 function supabaseOrNull() {
